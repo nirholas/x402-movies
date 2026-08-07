@@ -1,0 +1,1567 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "x402-movies",
+    "version": "0.1.0",
+    "description": "Movie catalog concierge over TMDB — search, details, and recommendations per query\n\nEvery paid route returns the purchased artifact in the 200 response body. Pay in USDC on Base or Solana — your client picks the rail.",
+    "license": {
+      "name": "Apache-2.0",
+      "identifier": "Apache-2.0"
+    },
+    "contact": {
+      "name": "nirholas",
+      "email": "nichxbt@gmail.com",
+      "url": "https://github.com/nirholas/x402-movies"
+    }
+  },
+  "servers": [
+    {
+      "url": "http://localhost:4024",
+      "description": "Local development"
+    },
+    {
+      "url": "{baseUrl}",
+      "description": "Deployed instance",
+      "variables": {
+        "baseUrl": {
+          "default": "http://localhost:4024"
+        }
+      }
+    }
+  ],
+  "externalDocs": {
+    "description": "Docs site",
+    "url": "https://nirholas.github.io/x402-movies/"
+  },
+  "tags": [
+    {
+      "name": "paid",
+      "description": "x402-paid routes. Artifact returned in the 200 body."
+    },
+    {
+      "name": "free",
+      "description": "Unpaid metadata routes."
+    }
+  ],
+  "paths": {
+    "/search": {
+      "get": {
+        "operationId": "searchMovies",
+        "summary": "Search the movie catalogue by title, optionally narrowed to a release year ($0.001)",
+        "description": "Search the movie catalogue by title, optionally narrowed to a release year\n\nPaid route — $0.001 in USDC. Pay on Base (EVM) or Solana; the 402 challenge lists both rails.",
+        "tags": [
+          "paid"
+        ],
+        "parameters": [
+          {
+            "name": "q",
+            "in": "query",
+            "required": true,
+            "description": "Title to search for, 1-200 characters.",
+            "schema": {
+              "type": "string"
+            },
+            "example": "blade runner"
+          },
+          {
+            "name": "year",
+            "in": "query",
+            "required": false,
+            "description": "Narrow to a primary release year, 1870…2100.",
+            "schema": {
+              "type": "integer"
+            },
+            "example": 1982
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "description": "Result page, 1…500. Default 1.",
+            "schema": {
+              "type": "integer"
+            },
+            "example": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Matching titles with year, rating, vote count, overview and artwork URLs",
+            "headers": {
+              "X-PAYMENT-RESPONSE": {
+                "description": "Base64 JSON settlement receipt.",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "source",
+                    "query",
+                    "page",
+                    "totalResults",
+                    "count",
+                    "results",
+                    "retrievedAt"
+                  ],
+                  "properties": {
+                    "source": {
+                      "type": "string",
+                      "enum": [
+                        "tmdb",
+                        "fixture"
+                      ]
+                    },
+                    "query": {
+                      "type": "object",
+                      "properties": {
+                        "q": {
+                          "type": "string"
+                        },
+                        "year": {
+                          "type": [
+                            "integer",
+                            "null"
+                          ]
+                        },
+                        "page": {
+                          "type": "integer"
+                        }
+                      }
+                    },
+                    "page": {
+                      "type": "integer"
+                    },
+                    "totalResults": {
+                      "type": "integer"
+                    },
+                    "totalPages": {
+                      "type": "integer"
+                    },
+                    "count": {
+                      "type": "integer"
+                    },
+                    "retrievedAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "results": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/MovieSummary"
+                      }
+                    }
+                  }
+                },
+                "example": {
+                  "source": "fixture",
+                  "query": {
+                    "q": "blade runner",
+                    "year": null,
+                    "page": 1
+                  },
+                  "page": 1,
+                  "totalResults": 8,
+                  "totalPages": 2,
+                  "count": 2,
+                  "results": [
+                    {
+                      "id": 524916,
+                      "title": "A Quiet Meridian",
+                      "originalTitle": "A Quiet Meridian",
+                      "overview": "A mystery about meridians, set in 2006. Deterministic fixture record — set TMDB_API_KEY for the real catalogue.",
+                      "releaseDate": "2006-10-13",
+                      "year": 2006,
+                      "voteAverage": 5.8,
+                      "voteCount": 3652,
+                      "popularity": 41.907,
+                      "posterUrl": null,
+                      "backdropUrl": null,
+                      "originalLanguage": "en",
+                      "adult": false,
+                      "tagline": "A Quiet meridian you will ever see.",
+                      "runtimeMinutes": 98,
+                      "status": "Released",
+                      "budget": 97000000,
+                      "revenue": 379255811,
+                      "genres": [
+                        "Mystery",
+                        "Thriller"
+                      ],
+                      "productionCompanies": [
+                        "Foldout Media"
+                      ],
+                      "spokenLanguages": [
+                        "English"
+                      ],
+                      "homepage": null,
+                      "imdbId": null,
+                      "cast": [
+                        {
+                          "id": 6149160,
+                          "name": "Iris Chen",
+                          "character": "Ellis",
+                          "order": 0,
+                          "profileUrl": null
+                        },
+                        {
+                          "id": 6149161,
+                          "name": "Priya Raghunathan",
+                          "character": "Nadia",
+                          "order": 1,
+                          "profileUrl": null
+                        },
+                        {
+                          "id": 6149162,
+                          "name": "Tomas Lind",
+                          "character": "Rowan",
+                          "order": 2,
+                          "profileUrl": null
+                        },
+                        {
+                          "id": 6149163,
+                          "name": "Sofia Marchetti",
+                          "character": "Sam",
+                          "order": 3,
+                          "profileUrl": null
+                        }
+                      ],
+                      "crew": [
+                        {
+                          "id": 1324916,
+                          "name": "Hanna Bergström",
+                          "job": "Director",
+                          "department": "Directing"
+                        },
+                        {
+                          "id": 1334916,
+                          "name": "Leo Vasquez",
+                          "job": "Screenplay",
+                          "department": "Writing"
+                        }
+                      ],
+                      "watchProviders": {
+                        "US": [
+                          {
+                            "provider": "Demo Streaming",
+                            "type": "flatrate",
+                            "logoUrl": null
+                          },
+                          {
+                            "provider": "Demo Rentals",
+                            "type": "rent",
+                            "logoUrl": null
+                          }
+                        ]
+                      },
+                      "releaseDates": [
+                        {
+                          "countryCode": "US",
+                          "date": "2006-10-13T00:00:00.000Z",
+                          "certification": "PG-13",
+                          "type": "theatrical"
+                        },
+                        {
+                          "countryCode": "US",
+                          "date": "2006-12-01T00:00:00.000Z",
+                          "certification": null,
+                          "type": "digital"
+                        }
+                      ]
+                    },
+                    {
+                      "id": 515685,
+                      "title": "After the Winter",
+                      "originalTitle": "After the Winter",
+                      "overview": "A adventure about winters, set in 2015. Deterministic fixture record — set TMDB_API_KEY for the real catalogue.",
+                      "releaseDate": "2015-10-22",
+                      "year": 2015,
+                      "voteAverage": 6.7,
+                      "voteCount": 1440,
+                      "popularity": 89.65,
+                      "posterUrl": null,
+                      "backdropUrl": null,
+                      "originalLanguage": "en",
+                      "adult": false,
+                      "tagline": "After the winter you will ever see.",
+                      "runtimeMinutes": 125,
+                      "status": "Released",
+                      "budget": 94000000,
+                      "revenue": 162875636,
+                      "genres": [
+                        "Adventure"
+                      ],
+                      "productionCompanies": [
+                        "Blue Harbour Films"
+                      ],
+                      "spokenLanguages": [
+                        "English"
+                      ],
+                      "homepage": null,
+                      "imdbId": null,
+                      "cast": [
+                        {
+                          "id": 6056850,
+                          "name": "Yuki Tanaka",
+                          "character": "Ellis",
+                          "order": 0,
+                          "profileUrl": null
+                        },
+                        {
+                          "id": 6056851,
+                          "name": "Ana Ferreira",
+                          "character": "Nadia",
+                          "order": 1,
+                          "profileUrl": null
+                        },
+                        {
+                          "id": 6056852,
+                          "name": "Leo Vasquez",
+                          "character": "Rowan",
+                          "order": 2,
+                          "profileUrl": null
+                        },
+                        {
+                          "id": 6056853,
+                          "name": "Daniel Okafor",
+                          "character": "Sam",
+                          "order": 3,
+                          "profileUrl": null
+                        }
+                      ],
+                      "crew": [
+                        {
+                          "id": 1315685,
+                          "name": "Iris Chen",
+                          "job": "Director",
+                          "department": "Directing"
+                        },
+                        {
+                          "id": 1325685,
+                          "name": "Ana Ferreira",
+                          "job": "Screenplay",
+                          "department": "Writing"
+                        }
+                      ],
+                      "watchProviders": {
+                        "US": [
+                          {
+                            "provider": "Demo Streaming",
+                            "type": "flatrate",
+                            "logoUrl": null
+                          },
+                          {
+                            "provider": "Demo Rentals",
+                            "type": "rent",
+                            "logoUrl": null
+                          }
+                        ]
+                      },
+                      "releaseDates": [
+                        {
+                          "countryCode": "US",
+                          "date": "2015-10-22T00:00:00.000Z",
+                          "certification": "PG-13",
+                          "type": "theatrical"
+                        },
+                        {
+                          "countryCode": "US",
+                          "date": "2015-12-01T00:00:00.000Z",
+                          "certification": null,
+                          "type": "digital"
+                        }
+                      ]
+                    }
+                  ],
+                  "retrievedAt": "2026-08-07T03:02:26.030Z"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid parameters.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "402": {
+            "description": "Payment required (or payment rejected). The body lists both accepted rails.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaymentRequired"
+                }
+              }
+            }
+          },
+          "502": {
+            "description": "Upstream data source failed.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/movie/{id}": {
+      "get": {
+        "operationId": "movieDetail",
+        "summary": "Full detail bundle for one movie ($0.001)",
+        "description": "Full detail bundle for one movie\n\nPaid route — $0.001 in USDC. Pay on Base (EVM) or Solana; the 402 challenge lists both rails.",
+        "tags": [
+          "paid"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "Movie id as returned by `/search`.",
+            "schema": {
+              "type": "integer"
+            },
+            "example": 524916
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Metadata, tagline, runtime, budget/revenue, genres, cast and key crew, streaming and rental providers by country, and release dates with certifications",
+            "headers": {
+              "X-PAYMENT-RESPONSE": {
+                "description": "Base64 JSON settlement receipt.",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "source",
+                    "movie",
+                    "retrievedAt"
+                  ],
+                  "properties": {
+                    "source": {
+                      "type": "string",
+                      "enum": [
+                        "tmdb",
+                        "fixture"
+                      ]
+                    },
+                    "retrievedAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "movie": {
+                      "$ref": "#/components/schemas/MovieDetail"
+                    }
+                  }
+                },
+                "example": {
+                  "source": "fixture",
+                  "movie": {
+                    "id": 524916,
+                    "title": "A Quiet Meridian",
+                    "originalTitle": "A Quiet Meridian",
+                    "overview": "A mystery about meridians, set in 2006. Deterministic fixture record — set TMDB_API_KEY for the real catalogue.",
+                    "releaseDate": "2006-10-13",
+                    "year": 2006,
+                    "voteAverage": 5.8,
+                    "voteCount": 3652,
+                    "popularity": 41.907,
+                    "posterUrl": null,
+                    "backdropUrl": null,
+                    "originalLanguage": "en",
+                    "adult": false,
+                    "tagline": "A Quiet meridian you will ever see.",
+                    "runtimeMinutes": 98,
+                    "status": "Released",
+                    "budget": 97000000,
+                    "revenue": 379255811,
+                    "genres": [
+                      "Mystery",
+                      "Thriller"
+                    ],
+                    "productionCompanies": [
+                      "Foldout Media"
+                    ],
+                    "spokenLanguages": [
+                      "English"
+                    ],
+                    "homepage": null,
+                    "imdbId": null,
+                    "cast": [
+                      {
+                        "id": 6149160,
+                        "name": "Iris Chen",
+                        "character": "Ellis",
+                        "order": 0,
+                        "profileUrl": null
+                      },
+                      {
+                        "id": 6149161,
+                        "name": "Priya Raghunathan",
+                        "character": "Nadia",
+                        "order": 1,
+                        "profileUrl": null
+                      },
+                      {
+                        "id": 6149162,
+                        "name": "Tomas Lind",
+                        "character": "Rowan",
+                        "order": 2,
+                        "profileUrl": null
+                      },
+                      {
+                        "id": 6149163,
+                        "name": "Sofia Marchetti",
+                        "character": "Sam",
+                        "order": 3,
+                        "profileUrl": null
+                      }
+                    ],
+                    "crew": [
+                      {
+                        "id": 1324916,
+                        "name": "Hanna Bergström",
+                        "job": "Director",
+                        "department": "Directing"
+                      },
+                      {
+                        "id": 1334916,
+                        "name": "Leo Vasquez",
+                        "job": "Screenplay",
+                        "department": "Writing"
+                      }
+                    ],
+                    "watchProviders": {
+                      "US": [
+                        {
+                          "provider": "Demo Streaming",
+                          "type": "flatrate",
+                          "logoUrl": null
+                        },
+                        {
+                          "provider": "Demo Rentals",
+                          "type": "rent",
+                          "logoUrl": null
+                        }
+                      ]
+                    },
+                    "releaseDates": [
+                      {
+                        "countryCode": "US",
+                        "date": "2006-10-13T00:00:00.000Z",
+                        "certification": "PG-13",
+                        "type": "theatrical"
+                      },
+                      {
+                        "countryCode": "US",
+                        "date": "2006-12-01T00:00:00.000Z",
+                        "certification": null,
+                        "type": "digital"
+                      }
+                    ]
+                  },
+                  "retrievedAt": "2026-08-07T03:02:26.031Z"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid parameters.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "402": {
+            "description": "Payment required (or payment rejected). The body lists both accepted rails.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaymentRequired"
+                }
+              }
+            }
+          },
+          "502": {
+            "description": "Upstream data source failed.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/recommendations/{id}": {
+      "get": {
+        "operationId": "movieRecommendations",
+        "summary": "Recommendations seeded by one movie, ranked with an explicit score and reasons ($0.002)",
+        "description": "Recommendations seeded by one movie, ranked with an explicit score and reasons\n\nPaid route — $0.002 in USDC. Pay on Base (EVM) or Solana; the 402 challenge lists both rails.",
+        "tags": [
+          "paid"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "Seed movie id.",
+            "schema": {
+              "type": "integer"
+            },
+            "example": 524916
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "description": "How many recommendations to return, 1…20. Default 10.",
+            "schema": {
+              "type": "integer"
+            },
+            "example": 3
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Ranked related titles, each with a 0-1 `score` and the `reasons` behind its placement — rating, vote confidence, era proximity, language match and popularity",
+            "headers": {
+              "X-PAYMENT-RESPONSE": {
+                "description": "Base64 JSON settlement receipt.",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "source",
+                    "seed",
+                    "count",
+                    "recommendations",
+                    "retrievedAt"
+                  ],
+                  "properties": {
+                    "source": {
+                      "type": "string",
+                      "enum": [
+                        "tmdb",
+                        "fixture"
+                      ]
+                    },
+                    "seed": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "integer"
+                        },
+                        "title": {
+                          "type": "string"
+                        }
+                      }
+                    },
+                    "count": {
+                      "type": "integer"
+                    },
+                    "retrievedAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "recommendations": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Recommendation"
+                      }
+                    }
+                  }
+                },
+                "example": {
+                  "source": "fixture",
+                  "seed": {
+                    "id": 524916,
+                    "title": "A Quiet Meridian"
+                  },
+                  "count": 3,
+                  "recommendations": [
+                    {
+                      "id": 624967,
+                      "title": "Return to Instrument",
+                      "originalTitle": "Return to Instrument",
+                      "overview": "A documentary about instruments, set in 2009. Deterministic fixture record — set TMDB_API_KEY for the real catalogue.",
+                      "releaseDate": "2009-02-03",
+                      "year": 2009,
+                      "voteAverage": 9,
+                      "voteCount": 2575,
+                      "popularity": 87.872,
+                      "posterUrl": null,
+                      "backdropUrl": null,
+                      "originalLanguage": "fr",
+                      "adult": false,
+                      "tagline": "Return to instrument you will ever see.",
+                      "runtimeMinutes": 107,
+                      "status": "Released",
+                      "budget": 17000000,
+                      "revenue": 69047681,
+                      "genres": [
+                        "Documentary"
+                      ],
+                      "productionCompanies": [
+                        "Blue Harbour Films"
+                      ],
+                      "spokenLanguages": [
+                        "English"
+                      ],
+                      "homepage": null,
+                      "imdbId": null,
+                      "cast": [
+                        {
+                          "id": 7149670,
+                          "name": "Daniel Okafor",
+                          "character": "Ellis",
+                          "order": 0,
+                          "profileUrl": null
+                        },
+                        {
+                          "id": 7149671,
+                          "name": "Priya Raghunathan",
+                          "character": "Nadia",
+                          "order": 1,
+                          "profileUrl": null
+                        },
+                        {
+                          "id": 7149672,
+                          "name": "Priya Raghunathan",
+                          "character": "Rowan",
+                          "order": 2,
+                          "profileUrl": null
+                        },
+                        {
+                          "id": 7149673,
+                          "name": "Sofia Marchetti",
+                          "character": "Sam",
+                          "order": 3,
+                          "profileUrl": null
+                        }
+                      ],
+                      "crew": [
+                        {
+                          "id": 1424967,
+                          "name": "Marcus Bell",
+                          "job": "Director",
+                          "department": "Directing"
+                        },
+                        {
+                          "id": 1434967,
+                          "name": "Tomas Lind",
+                          "job": "Screenplay",
+                          "department": "Writing"
+                        }
+                      ],
+                      "watchProviders": {
+                        "US": [
+                          {
+                            "provider": "Demo Streaming",
+                            "type": "flatrate",
+                            "logoUrl": null
+                          },
+                          {
+                            "provider": "Demo Rentals",
+                            "type": "rent",
+                            "logoUrl": null
+                          }
+                        ]
+                      },
+                      "releaseDates": [
+                        {
+                          "countryCode": "US",
+                          "date": "2009-02-03T00:00:00.000Z",
+                          "certification": "PG-13",
+                          "type": "theatrical"
+                        },
+                        {
+                          "countryCode": "US",
+                          "date": "2009-05-01T00:00:00.000Z",
+                          "certification": null,
+                          "type": "digital"
+                        }
+                      ],
+                      "score": 0.7557,
+                      "reasons": [
+                        "highly rated (9/10)",
+                        "large vote sample",
+                        "released within 5 years of A Quiet Meridian"
+                      ]
+                    },
+                    {
+                      "id": 196010,
+                      "title": "Winter of the Lighthouse",
+                      "originalTitle": "Winter of the Lighthouse",
+                      "overview": "A comedy about lighthouses, set in 1999. Deterministic fixture record — set TMDB_API_KEY for the real catalogue.",
+                      "releaseDate": "1999-02-12",
+                      "year": 1999,
+                      "voteAverage": 6.3,
+                      "voteCount": 1587,
+                      "popularity": 68.234,
+                      "posterUrl": null,
+                      "backdropUrl": null,
+                      "originalLanguage": "en",
+                      "adult": false,
+                      "tagline": "Winter of the lighthouse you will ever see.",
+                      "runtimeMinutes": 110,
+                      "status": "Released",
+                      "budget": 83000000,
+                      "revenue": 288744616,
+                      "genres": [
+                        "Comedy",
+                        "Adventure"
+                      ],
+                      "productionCompanies": [
+                        "Northwind Pictures"
+                      ],
+                      "spokenLanguages": [
+                        "English"
+                      ],
+                      "homepage": null,
+                      "imdbId": null,
+                      "cast": [
+                        {
+                          "id": 2860100,
+                          "name": "Marcus Bell",
+                          "character": "Ellis",
+                          "order": 0,
+                          "profileUrl": null
+                        },
+                        {
+                          "id": 2860101,
+                          "name": "Leo Vasquez",
+                          "character": "Nadia",
+                          "order": 1,
+                          "profileUrl": null
+                        },
+                        {
+                          "id": 2860102,
+                          "name": "Priya Raghunathan",
+                          "character": "Rowan",
+                          "order": 2,
+                          "profileUrl": null
+                        },
+                        {
+                          "id": 2860103,
+                          "name": "Tomas Lind",
+                          "character": "Sam",
+                          "order": 3,
+                          "profileUrl": null
+                        }
+                      ],
+                      "crew": [
+                        {
+                          "id": 996010,
+                          "name": "Priya Raghunathan",
+                          "job": "Director",
+                          "department": "Directing"
+                        },
+                        {
+                          "id": 1006010,
+                          "name": "Priya Raghunathan",
+                          "job": "Screenplay",
+                          "department": "Writing"
+                        }
+                      ],
+                      "watchProviders": {
+                        "US": [
+                          {
+                            "provider": "Demo Streaming",
+                            "type": "flatrate",
+                            "logoUrl": null
+                          },
+                          {
+                            "provider": "Demo Rentals",
+                            "type": "rent",
+                            "logoUrl": null
+                          }
+                        ]
+                      },
+                      "releaseDates": [
+                        {
+                          "countryCode": "US",
+                          "date": "1999-02-12T00:00:00.000Z",
+                          "certification": "PG-13",
+                          "type": "theatrical"
+                        },
+                        {
+                          "countryCode": "US",
+                          "date": "1999-05-01T00:00:00.000Z",
+                          "certification": null,
+                          "type": "digital"
+                        }
+                      ],
+                      "score": 0.7185,
+                      "reasons": [
+                        "large vote sample",
+                        "same original language (en)"
+                      ]
+                    },
+                    {
+                      "id": 334548,
+                      "title": "Echoes of Frequency",
+                      "originalTitle": "Echoes of Frequency",
+                      "overview": "A documentary about frequencys, set in 2005. Deterministic fixture record — set TMDB_API_KEY for the real catalogue.",
+                      "releaseDate": "2005-10-22",
+                      "year": 2005,
+                      "voteAverage": 6.9,
+                      "voteCount": 2082,
+                      "popularity": 22.555,
+                      "posterUrl": null,
+                      "backdropUrl": null,
+                      "originalLanguage": "en",
+                      "adult": false,
+                      "tagline": "Echoes of frequency you will ever see.",
+                      "runtimeMinutes": 147,
+                      "status": "Released",
+                      "budget": 76000000,
+                      "revenue": 113248813,
+                      "genres": [
+                        "Documentary",
+                        "Mystery"
+                      ],
+                      "productionCompanies": [
+                        "Meridian Studios"
+                      ],
+                      "spokenLanguages": [
+                        "English"
+                      ],
+                      "homepage": null,
+                      "imdbId": null,
+                      "cast": [
+                        {
+                          "id": 4245480,
+                          "name": "Tomas Lind",
+                          "character": "Ellis",
+                          "order": 0,
+                          "profileUrl": null
+                        },
+                        {
+                          "id": 4245481,
+                          "name": "Priya Raghunathan",
+                          "character": "Nadia",
+                          "order": 1,
+                          "profileUrl": null
+                        },
+                        {
+                          "id": 4245482,
+                          "name": "Daniel Okafor",
+                          "character": "Rowan",
+                          "order": 2,
+                          "profileUrl": null
+                        },
+                        {
+                          "id": 4245483,
+                          "name": "Ana Ferreira",
+                          "character": "Sam",
+                          "order": 3,
+                          "profileUrl": null
+                        }
+                      ],
+                      "crew": [
+                        {
+                          "id": 1134548,
+                          "name": "Daniel Okafor",
+                          "job": "Director",
+                          "department": "Directing"
+                        },
+                        {
+                          "id": 1144548,
+                          "name": "Yuki Tanaka",
+                          "job": "Screenplay",
+                          "department": "Writing"
+                        }
+                      ],
+                      "watchProviders": {
+                        "US": [
+                          {
+                            "provider": "Demo Streaming",
+                            "type": "flatrate",
+                            "logoUrl": null
+                          },
+                          {
+                            "provider": "Demo Rentals",
+                            "type": "rent",
+                            "logoUrl": null
+                          }
+                        ]
+                      },
+                      "releaseDates": [
+                        {
+                          "countryCode": "US",
+                          "date": "2005-10-22T00:00:00.000Z",
+                          "certification": "PG-13",
+                          "type": "theatrical"
+                        },
+                        {
+                          "countryCode": "US",
+                          "date": "2005-12-01T00:00:00.000Z",
+                          "certification": null,
+                          "type": "digital"
+                        }
+                      ],
+                      "score": 0.7111,
+                      "reasons": [
+                        "large vote sample",
+                        "released within 5 years of A Quiet Meridian",
+                        "same original language (en)"
+                      ]
+                    }
+                  ],
+                  "retrievedAt": "2026-08-07T03:02:26.032Z"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid parameters.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "402": {
+            "description": "Payment required (or payment rejected). The body lists both accepted rails.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaymentRequired"
+                }
+              }
+            }
+          },
+          "502": {
+            "description": "Upstream data source failed.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/": {
+      "get": {
+        "operationId": "serviceInfo",
+        "summary": "Service metadata, live prices, and active payment rails (free)",
+        "tags": [
+          "free"
+        ],
+        "responses": {
+          "200": {
+            "description": "Service metadata.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/health": {
+      "get": {
+        "operationId": "health",
+        "summary": "Liveness probe (free)",
+        "tags": [
+          "free"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string"
+                    },
+                    "uptime": {
+                      "type": "number"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/.well-known/x402": {
+      "get": {
+        "operationId": "discoveryManifest",
+        "summary": "x402 discovery manifest (free)",
+        "tags": [
+          "free"
+        ],
+        "responses": {
+          "200": {
+            "description": "Manifest.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "MovieSummary": {
+        "type": "object",
+        "required": [
+          "id",
+          "title",
+          "overview"
+        ],
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "Pass to `/movie/:id` and `/recommendations/:id`."
+          },
+          "title": {
+            "type": "string"
+          },
+          "originalTitle": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "overview": {
+            "type": "string"
+          },
+          "releaseDate": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "`YYYY-MM-DD`."
+          },
+          "year": {
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "voteAverage": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "description": "0-10."
+          },
+          "voteCount": {
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "popularity": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "posterUrl": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uri"
+          },
+          "backdropUrl": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uri"
+          },
+          "originalLanguage": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "ISO 639-1."
+          },
+          "adult": {
+            "type": "boolean"
+          }
+        }
+      },
+      "MovieDetail": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/MovieSummary"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "tagline": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "runtimeMinutes": {
+                "type": [
+                  "integer",
+                  "null"
+                ]
+              },
+              "status": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "budget": {
+                "type": [
+                  "integer",
+                  "null"
+                ]
+              },
+              "revenue": {
+                "type": [
+                  "integer",
+                  "null"
+                ]
+              },
+              "genres": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "productionCompanies": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "spokenLanguages": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "homepage": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "format": "uri"
+              },
+              "imdbId": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "cast": {
+                "type": "array",
+                "description": "Top-billed cast, up to 15.",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "integer"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "character": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "order": {
+                      "type": "integer"
+                    },
+                    "profileUrl": {
+                      "type": [
+                        "string",
+                        "null"
+                      ],
+                      "format": "uri"
+                    }
+                  }
+                }
+              },
+              "crew": {
+                "type": "array",
+                "description": "Key crew only: directors, writers, producers, composer, DoP.",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "integer"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "job": {
+                      "type": "string"
+                    },
+                    "department": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    }
+                  }
+                }
+              },
+              "watchProviders": {
+                "type": "object",
+                "description": "Availability keyed by ISO 3166-1 country code.",
+                "additionalProperties": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "provider": {
+                        "type": "string"
+                      },
+                      "type": {
+                        "type": "string",
+                        "enum": [
+                          "flatrate",
+                          "rent",
+                          "buy",
+                          "ads",
+                          "free"
+                        ]
+                      },
+                      "logoUrl": {
+                        "type": [
+                          "string",
+                          "null"
+                        ],
+                        "format": "uri"
+                      }
+                    }
+                  }
+                }
+              },
+              "releaseDates": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "countryCode": {
+                      "type": "string"
+                    },
+                    "date": {
+                      "type": [
+                        "string",
+                        "null"
+                      ],
+                      "format": "date-time"
+                    },
+                    "certification": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "type": {
+                      "type": "string",
+                      "enum": [
+                        "premiere",
+                        "theatrical_limited",
+                        "theatrical",
+                        "digital",
+                        "physical",
+                        "tv",
+                        "unknown"
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          }
+        ]
+      },
+      "Recommendation": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/MovieSummary"
+          },
+          {
+            "type": "object",
+            "required": [
+              "score",
+              "reasons"
+            ],
+            "properties": {
+              "score": {
+                "type": "number",
+                "description": "0-1 relevance, highest first."
+              },
+              "reasons": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "description": "Plain-language justification for the placement."
+              }
+            }
+          }
+        ]
+      },
+      "Error": {
+        "type": "object",
+        "required": [
+          "error"
+        ],
+        "properties": {
+          "error": {
+            "type": "string",
+            "description": "Machine-readable error code."
+          },
+          "message": {
+            "type": "string",
+            "description": "Human-readable description."
+          }
+        }
+      },
+      "PaymentRequirements": {
+        "type": "object",
+        "description": "One accepted payment rail, per the x402 specification.",
+        "required": [
+          "scheme",
+          "network",
+          "maxAmountRequired",
+          "resource",
+          "payTo",
+          "asset"
+        ],
+        "properties": {
+          "scheme": {
+            "type": "string",
+            "enum": [
+              "exact"
+            ]
+          },
+          "network": {
+            "type": "string",
+            "enum": [
+              "base-sepolia",
+              "base",
+              "solana",
+              "solana-devnet"
+            ],
+            "description": "EVM or Solana network this rail settles on."
+          },
+          "maxAmountRequired": {
+            "type": "string",
+            "description": "Price in USDC base units (6 decimals)."
+          },
+          "resource": {
+            "type": "string",
+            "format": "uri"
+          },
+          "description": {
+            "type": "string"
+          },
+          "mimeType": {
+            "type": "string"
+          },
+          "payTo": {
+            "type": "string",
+            "description": "Receive address (0x… for EVM, base58 for Solana)."
+          },
+          "maxTimeoutSeconds": {
+            "type": "integer"
+          },
+          "asset": {
+            "type": "string",
+            "description": "USDC contract address or SPL mint."
+          },
+          "outputSchema": {
+            "type": "object"
+          },
+          "extra": {
+            "type": "object",
+            "description": "EVM: EIP-712 domain (`name`, `version`). Solana: `feePayer`, the sponsor that pays the SOL network fee."
+          }
+        }
+      },
+      "PaymentRequired": {
+        "type": "object",
+        "required": [
+          "x402Version",
+          "accepts"
+        ],
+        "properties": {
+          "x402Version": {
+            "type": "integer",
+            "enum": [
+              1
+            ]
+          },
+          "error": {
+            "type": "string"
+          },
+          "hint": {
+            "type": "string"
+          },
+          "accepts": {
+            "type": "array",
+            "description": "Both rails: USDC on Base and USDC on Solana.",
+            "items": {
+              "$ref": "#/components/schemas/PaymentRequirements"
+            }
+          }
+        }
+      }
+    }
+  }
+}

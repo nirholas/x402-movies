@@ -1,0 +1,700 @@
+{
+  "x402Version": 1,
+  "name": "x402-movies",
+  "description": "Movie catalog concierge over TMDB — search, details, and recommendations per query",
+  "homepage": "https://nirholas.github.io/x402-movies/",
+  "repository": "https://github.com/nirholas/x402-movies",
+  "contact": "nichxbt@gmail.com",
+  "skill": "https://github.com/nirholas/x402-movies/blob/main/skill.md",
+  "openapi": "https://github.com/nirholas/x402-movies/blob/main/openapi.json",
+  "payment": {
+    "note": "Pay in USDC on Base or Solana — your client picks the rail.",
+    "facilitator": "https://x402.org/facilitator",
+    "rails": [
+      {
+        "rail": "evm",
+        "network": "base-sepolia",
+        "asset": "USDC",
+        "payTo": "0x40252CFDF8B20Ed757D61ff157719F33Ec332402",
+        "decimals": 6
+      },
+      {
+        "rail": "solana",
+        "network": "solana",
+        "asset": "USDC",
+        "payTo": "WwwuGbqHrwF5RG89KhUbmRWEvjnRH9k5kVM5p7T3WwW",
+        "decimals": 6
+      }
+    ]
+  },
+  "resources": [
+    {
+      "resource": "GET /search",
+      "description": "Search the movie catalogue by title, optionally narrowed to a release year",
+      "price": "$0.001",
+      "network": "base-sepolia",
+      "networks": [
+        "base-sepolia",
+        "solana"
+      ],
+      "asset": "USDC",
+      "accepts": [
+        {
+          "scheme": "exact",
+          "network": "base-sepolia",
+          "asset": "USDC",
+          "payTo": "0x40252CFDF8B20Ed757D61ff157719F33Ec332402",
+          "maxAmountRequired": "1000",
+          "mimeType": "application/json"
+        },
+        {
+          "scheme": "exact",
+          "network": "solana",
+          "asset": "USDC",
+          "payTo": "WwwuGbqHrwF5RG89KhUbmRWEvjnRH9k5kVM5p7T3WwW",
+          "maxAmountRequired": "1000",
+          "mimeType": "application/json"
+        }
+      ],
+      "outputSchema": {
+        "type": "object",
+        "required": [
+          "source",
+          "query",
+          "page",
+          "totalResults",
+          "count",
+          "results",
+          "retrievedAt"
+        ],
+        "properties": {
+          "source": {
+            "type": "string",
+            "enum": [
+              "tmdb",
+              "fixture"
+            ]
+          },
+          "query": {
+            "type": "object",
+            "properties": {
+              "q": {
+                "type": "string"
+              },
+              "year": {
+                "type": [
+                  "integer",
+                  "null"
+                ]
+              },
+              "page": {
+                "type": "integer"
+              }
+            }
+          },
+          "page": {
+            "type": "integer"
+          },
+          "totalResults": {
+            "type": "integer"
+          },
+          "totalPages": {
+            "type": "integer"
+          },
+          "count": {
+            "type": "integer"
+          },
+          "retrievedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "results": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": [
+                "id",
+                "title",
+                "overview"
+              ],
+              "properties": {
+                "id": {
+                  "type": "integer",
+                  "description": "Pass to `/movie/:id` and `/recommendations/:id`."
+                },
+                "title": {
+                  "type": "string"
+                },
+                "originalTitle": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "overview": {
+                  "type": "string"
+                },
+                "releaseDate": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "description": "`YYYY-MM-DD`."
+                },
+                "year": {
+                  "type": [
+                    "integer",
+                    "null"
+                  ]
+                },
+                "voteAverage": {
+                  "type": [
+                    "number",
+                    "null"
+                  ],
+                  "description": "0-10."
+                },
+                "voteCount": {
+                  "type": [
+                    "integer",
+                    "null"
+                  ]
+                },
+                "popularity": {
+                  "type": [
+                    "number",
+                    "null"
+                  ]
+                },
+                "posterUrl": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "format": "uri"
+                },
+                "backdropUrl": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "format": "uri"
+                },
+                "originalLanguage": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "description": "ISO 639-1."
+                },
+                "adult": {
+                  "type": "boolean"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "resource": "GET /movie/:id",
+      "description": "Full detail bundle for one movie",
+      "price": "$0.001",
+      "network": "base-sepolia",
+      "networks": [
+        "base-sepolia",
+        "solana"
+      ],
+      "asset": "USDC",
+      "accepts": [
+        {
+          "scheme": "exact",
+          "network": "base-sepolia",
+          "asset": "USDC",
+          "payTo": "0x40252CFDF8B20Ed757D61ff157719F33Ec332402",
+          "maxAmountRequired": "1000",
+          "mimeType": "application/json"
+        },
+        {
+          "scheme": "exact",
+          "network": "solana",
+          "asset": "USDC",
+          "payTo": "WwwuGbqHrwF5RG89KhUbmRWEvjnRH9k5kVM5p7T3WwW",
+          "maxAmountRequired": "1000",
+          "mimeType": "application/json"
+        }
+      ],
+      "outputSchema": {
+        "type": "object",
+        "required": [
+          "source",
+          "movie",
+          "retrievedAt"
+        ],
+        "properties": {
+          "source": {
+            "type": "string",
+            "enum": [
+              "tmdb",
+              "fixture"
+            ]
+          },
+          "retrievedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "movie": {
+            "allOf": [
+              {
+                "type": "object",
+                "required": [
+                  "id",
+                  "title",
+                  "overview"
+                ],
+                "properties": {
+                  "id": {
+                    "type": "integer",
+                    "description": "Pass to `/movie/:id` and `/recommendations/:id`."
+                  },
+                  "title": {
+                    "type": "string"
+                  },
+                  "originalTitle": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "overview": {
+                    "type": "string"
+                  },
+                  "releaseDate": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "description": "`YYYY-MM-DD`."
+                  },
+                  "year": {
+                    "type": [
+                      "integer",
+                      "null"
+                    ]
+                  },
+                  "voteAverage": {
+                    "type": [
+                      "number",
+                      "null"
+                    ],
+                    "description": "0-10."
+                  },
+                  "voteCount": {
+                    "type": [
+                      "integer",
+                      "null"
+                    ]
+                  },
+                  "popularity": {
+                    "type": [
+                      "number",
+                      "null"
+                    ]
+                  },
+                  "posterUrl": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "format": "uri"
+                  },
+                  "backdropUrl": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "format": "uri"
+                  },
+                  "originalLanguage": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "description": "ISO 639-1."
+                  },
+                  "adult": {
+                    "type": "boolean"
+                  }
+                }
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "tagline": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "runtimeMinutes": {
+                    "type": [
+                      "integer",
+                      "null"
+                    ]
+                  },
+                  "status": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "budget": {
+                    "type": [
+                      "integer",
+                      "null"
+                    ]
+                  },
+                  "revenue": {
+                    "type": [
+                      "integer",
+                      "null"
+                    ]
+                  },
+                  "genres": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "productionCompanies": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "spokenLanguages": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "homepage": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "format": "uri"
+                  },
+                  "imdbId": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "cast": {
+                    "type": "array",
+                    "description": "Top-billed cast, up to 15.",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "integer"
+                        },
+                        "name": {
+                          "type": "string"
+                        },
+                        "character": {
+                          "type": [
+                            "string",
+                            "null"
+                          ]
+                        },
+                        "order": {
+                          "type": "integer"
+                        },
+                        "profileUrl": {
+                          "type": [
+                            "string",
+                            "null"
+                          ],
+                          "format": "uri"
+                        }
+                      }
+                    }
+                  },
+                  "crew": {
+                    "type": "array",
+                    "description": "Key crew only: directors, writers, producers, composer, DoP.",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "integer"
+                        },
+                        "name": {
+                          "type": "string"
+                        },
+                        "job": {
+                          "type": "string"
+                        },
+                        "department": {
+                          "type": [
+                            "string",
+                            "null"
+                          ]
+                        }
+                      }
+                    }
+                  },
+                  "watchProviders": {
+                    "type": "object",
+                    "description": "Availability keyed by ISO 3166-1 country code.",
+                    "additionalProperties": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "provider": {
+                            "type": "string"
+                          },
+                          "type": {
+                            "type": "string",
+                            "enum": [
+                              "flatrate",
+                              "rent",
+                              "buy",
+                              "ads",
+                              "free"
+                            ]
+                          },
+                          "logoUrl": {
+                            "type": [
+                              "string",
+                              "null"
+                            ],
+                            "format": "uri"
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "releaseDates": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "countryCode": {
+                          "type": "string"
+                        },
+                        "date": {
+                          "type": [
+                            "string",
+                            "null"
+                          ],
+                          "format": "date-time"
+                        },
+                        "certification": {
+                          "type": [
+                            "string",
+                            "null"
+                          ]
+                        },
+                        "type": {
+                          "type": "string",
+                          "enum": [
+                            "premiere",
+                            "theatrical_limited",
+                            "theatrical",
+                            "digital",
+                            "physical",
+                            "tv",
+                            "unknown"
+                          ]
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "resource": "GET /recommendations/:id",
+      "description": "Recommendations seeded by one movie, ranked with an explicit score and reasons",
+      "price": "$0.002",
+      "network": "base-sepolia",
+      "networks": [
+        "base-sepolia",
+        "solana"
+      ],
+      "asset": "USDC",
+      "accepts": [
+        {
+          "scheme": "exact",
+          "network": "base-sepolia",
+          "asset": "USDC",
+          "payTo": "0x40252CFDF8B20Ed757D61ff157719F33Ec332402",
+          "maxAmountRequired": "2000",
+          "mimeType": "application/json"
+        },
+        {
+          "scheme": "exact",
+          "network": "solana",
+          "asset": "USDC",
+          "payTo": "WwwuGbqHrwF5RG89KhUbmRWEvjnRH9k5kVM5p7T3WwW",
+          "maxAmountRequired": "2000",
+          "mimeType": "application/json"
+        }
+      ],
+      "outputSchema": {
+        "type": "object",
+        "required": [
+          "source",
+          "seed",
+          "count",
+          "recommendations",
+          "retrievedAt"
+        ],
+        "properties": {
+          "source": {
+            "type": "string",
+            "enum": [
+              "tmdb",
+              "fixture"
+            ]
+          },
+          "seed": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "integer"
+              },
+              "title": {
+                "type": "string"
+              }
+            }
+          },
+          "count": {
+            "type": "integer"
+          },
+          "retrievedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "recommendations": {
+            "type": "array",
+            "items": {
+              "allOf": [
+                {
+                  "type": "object",
+                  "required": [
+                    "id",
+                    "title",
+                    "overview"
+                  ],
+                  "properties": {
+                    "id": {
+                      "type": "integer",
+                      "description": "Pass to `/movie/:id` and `/recommendations/:id`."
+                    },
+                    "title": {
+                      "type": "string"
+                    },
+                    "originalTitle": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "overview": {
+                      "type": "string"
+                    },
+                    "releaseDate": {
+                      "type": [
+                        "string",
+                        "null"
+                      ],
+                      "description": "`YYYY-MM-DD`."
+                    },
+                    "year": {
+                      "type": [
+                        "integer",
+                        "null"
+                      ]
+                    },
+                    "voteAverage": {
+                      "type": [
+                        "number",
+                        "null"
+                      ],
+                      "description": "0-10."
+                    },
+                    "voteCount": {
+                      "type": [
+                        "integer",
+                        "null"
+                      ]
+                    },
+                    "popularity": {
+                      "type": [
+                        "number",
+                        "null"
+                      ]
+                    },
+                    "posterUrl": {
+                      "type": [
+                        "string",
+                        "null"
+                      ],
+                      "format": "uri"
+                    },
+                    "backdropUrl": {
+                      "type": [
+                        "string",
+                        "null"
+                      ],
+                      "format": "uri"
+                    },
+                    "originalLanguage": {
+                      "type": [
+                        "string",
+                        "null"
+                      ],
+                      "description": "ISO 639-1."
+                    },
+                    "adult": {
+                      "type": "boolean"
+                    }
+                  }
+                },
+                {
+                  "type": "object",
+                  "required": [
+                    "score",
+                    "reasons"
+                  ],
+                  "properties": {
+                    "score": {
+                      "type": "number",
+                      "description": "0-1 relevance, highest first."
+                    },
+                    "reasons": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      },
+                      "description": "Plain-language justification for the placement."
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        }
+      }
+    }
+  ]
+}
