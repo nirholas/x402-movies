@@ -18,6 +18,7 @@ import {
   usingSuiteDefaultPayTo,
   type RoutePrices,
 } from "./payments.js";
+import { ROUTE_SCHEMAS } from "./schemas.js";
 import {
   hasTmdbCredentials,
   movieDetail,
@@ -35,38 +36,19 @@ const ROUTES: RoutePrices = {
     price: "$0.001",
     description:
       "Movie search over TMDB. Returns matching titles with year, rating, overview and artwork.",
-    outputSchema: {
-      type: "object",
-      properties: {
-        source: { type: "string", enum: ["tmdb", "fixture"] },
-        totalResults: { type: "integer" },
-        results: { type: "array", items: { type: "object" } },
-      },
-    },
+    outputSchema: ROUTE_SCHEMAS["GET /search"],
   },
   "GET /movie/:id": {
     price: "$0.001",
     description:
       "Full detail bundle for one movie: metadata, genres, cast and key crew, streaming/rental providers by country, and release dates with certifications.",
-    outputSchema: {
-      type: "object",
-      properties: {
-        source: { type: "string", enum: ["tmdb", "fixture"] },
-        movie: { type: "object" },
-      },
-    },
+    outputSchema: ROUTE_SCHEMAS["GET /movie/:id"],
   },
   "GET /recommendations/:id": {
     price: "$0.002",
     description:
       "Recommendations seeded by one movie, ranked by this service with an explicit score and reasons per title.",
-    outputSchema: {
-      type: "object",
-      properties: {
-        source: { type: "string", enum: ["tmdb", "fixture"] },
-        recommendations: { type: "array", items: { type: "object" } },
-      },
-    },
+    outputSchema: ROUTE_SCHEMAS["GET /recommendations/:id"],
   },
 };
 
@@ -86,10 +68,19 @@ app.get("/.well-known/x402", (_req, res) => {
   res.type("application/json").sendFile(join(publicDir, ".well-known", "x402"));
 });
 
-app.use(express.static(publicDir));
+// `index: false` keeps `GET /` on the handler below, which serves the landing
+// page to browsers and the JSON service descriptor to agents.
+app.use(express.static(publicDir, { index: false }));
 
 // Free: service info.
-app.get("/", (_req, res) => {
+// Content-negotiated — `Accept: text/html` (a browser, or a crawler looking for
+// title/description/favicon/og:image) gets the landing page; everything else,
+// including `Accept: */*`, gets the JSON descriptor.
+app.get("/", (req, res) => {
+  if (req.accepts(["json", "html"]) === "html") {
+    res.sendFile(join(publicDir, "index.html"));
+    return;
+  }
   res.json({
     name: "x402-movies",
     description: "Movie catalog concierge over TMDB — search, details, and recommendations per query",
