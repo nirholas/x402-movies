@@ -1,0 +1,10 @@
+cff-version: 1.2.0
+message: If you use this software, please cite it as below.
+title: "x402-movies"
+abstract: "Movie catalog concierge over TMDB: search, details, and recommendations per query, paid in USDC on Base or Solana via x402"
+license: Apache-2.0
+repository-code: "https://github.com/nirholas/x402-movies"
+url: "https://three.ws"
+authors:
+  - name: three.ws
+    website: "https://three.ws"
