@@ -1,0 +1,22 @@
+{
+  "name": "x402-movies",
+  "owner": {
+    "name": "nirholas"
+  },
+  "description": "Run the x402-movies service and call its paid TMDB movie search, detail and recommendation routes with USDC on Base or Solana.",
+  "plugins": [
+    {
+      "name": "x402-movies",
+      "source": "./plugins/x402-movies",
+      "description": "Run the x402-movies service and call its paid TMDB movie search, detail and recommendation routes with USDC on Base or Solana.",
+      "category": "data",
+      "tags": [
+        "x402",
+        "movies",
+        "tmdb",
+        "usdc",
+        "recommendations"
+      ]
+    }
+  ]
+}
