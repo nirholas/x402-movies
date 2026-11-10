@@ -1,0 +1,18 @@
+{
+  "name": "x402-movies",
+  "version": "0.1.0",
+  "description": "Run the x402-movies service and call its paid TMDB movie search, detail and recommendation routes with USDC on Base or Solana.",
+  "author": {
+    "name": "nirholas"
+  },
+  "repository": "https://github.com/nirholas/x402-movies",
+  "homepage": "https://nirholas.github.io/x402-movies/",
+  "license": "Apache-2.0",
+  "keywords": [
+    "x402",
+    "movies",
+    "tmdb",
+    "usdc",
+    "recommendations"
+  ]
+}
